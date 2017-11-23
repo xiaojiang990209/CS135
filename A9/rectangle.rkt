@@ -63,6 +63,21 @@
           (make-cell 7 false)
           (make-cell 8 false))) empty))
 
+(define state1
+  (make-state
+   (list (list
+          (make-cell 0 true)
+          (make-cell 0 true)
+          (make-cell 2 true))
+         (list
+          (make-cell 0 true)
+          (make-cell 4 true)
+          (make-cell 5 false))
+         (list
+          (make-cell 6 false)
+          (make-cell 7 false)
+          (make-cell 8 false))) empty))
+
 
 ;; ====================== (A) ==========================
 ;; (map2d f nested-lst) consumes a function f and a list of lists
@@ -157,49 +172,55 @@
                              (rect-in-grid/acc (rest grid) (add1 y))]))]
               (rect-in-grid/acc grid 0)))
 
-(define (contains-used-row? rect grid)
-  (local [(define rectangle (rect-in-grid rect grid))]
+(define (contains-used-cell? rect grid)
+  (local [(define rectangle (rect-in-grid rect grid))
+          (define (contains-used-cell/row? row)
+            (foldr (lambda (f r) (cond [(cell-used? f) true]
+                                       [else r])) false row))]
   (foldr (lambda (flst rlst)
-           (local [(define partial-result
-                     (foldr (lambda (f r)
-                              (cond [(false? (cell-used? f)) r]
-                                    [else true])) false flst))]
-             (cond [(false? partial-result) rlst]
-                   [else true])))
+           (cond [(contains-used-cell/row? flst) true]
+                 [else rlst]))
          false rectangle)))
 
-(define (contains-one-number? rec)
+(define (contains-one-number? rect grid)
+  (local [(define rectangle (rect-in-grid rect grid))
+          (define (count-non-zero-number-row row)
+            (length (filter (lambda (x) (not (zero? (cell-num x)))) row)))
+          (define (count-non-zero-number-rect rect)
+            (foldr (lambda (flst rlst)
+                     (+ (count-non-zero-number-row flst) rlst)) 0 rect))]
+    (= 1 (count-non-zero-number-rect rectangle))))
+
+(define (find-only-num rect grid)
   (local [(define rectangle (rect-in-grid rect grid))]
-  (foldr (lambda (flst rlst)
-           (local [(define partial-result
-                     (foldr (lambda (f r)
-                              (cond [(and (not (zero? f)) r) false]
-                                    [else r])) flst))]
-             (cond [(false? partial-result) false]
-                   [else rlst]))))))
+    (foldr (lambda (flst rlst)
+             (cons (filter (lambda (x) (not (zero? (cell-num x)))) flst) rlst))
+           empty rectangle)))
+
+(define (num-equal-area? rect grid)
+  (local [(define rectangle (rect-in-grid rect grid))
+          (define only-num
+            (cell-num
+             (first (first
+              (filter cons?
+                      (foldr (lambda (flst rlst)
+                               (cons (filter (lambda (x)
+                                               (not (zero? (cell-num x))))
+                                             flst) rlst))
+                             empty rectangle))))))
+          (define area (* (rect-w rect) (rect-h rect)))]
+    (= only-num area)))
+                     
+
+
 
 (define (valid-rect? rect grid)
-  (local [(define rectangle (rect-in-grid rect grid))
-          (define (contains-used-cell? rec)
-            (foldr (lambda (flst rlst)
-                     (local [(define partial-result
-                               (foldr (lambda (f r)
-                                        (cond [(false? (cell-used? f)) r]
-                                              [else true])) flst))]
-                       (cond [(false? partial-result) rlst]
-                             [else true])))
-                   false rectangle))
-          (define (contains-one-number? rec)
-            (foldr (lambda (flst rlst)
-                     (local [(define partial-result
-                               (foldr (lambda (f r)
-                                        (cond [(and (not (zero? f)) r) false]
-                                              [else r])) flst))]
-                       (cond [(false? partial-result) false]
-                             [else rlst]))) false rectangle))] 
-                              
+  (local [(define rectangle (rect-in-grid rect grid))]
+    (and (not (contains-used-cell rect grid))
+         (contains-one-number? rect grid)
+         (num-equal-area? rect grid))))
+          
 
-           empty))
     
 
 ;;(define (valid-rec? rect grid)
