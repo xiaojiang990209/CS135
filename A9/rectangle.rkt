@@ -131,19 +131,86 @@
 ;;   state after adding a single rectangle.
 ;; neighbours: State -> (listof State)
 
-(define (valid-rec? rect grid)
-  (local [(define rect-in-grid
-            (filter (
-          (define (contains-used-row? rect row)
-            (cond [(
-          (define (contains-used? rect grid)
-            empty)
-          (define (contains-more-than-one-number? rect grid)
-            empty)
+;; rect contains x y w h
 
-(define (go-right-down grid start-x start-y)
-  (local [(define go-right/acc row start-x width)
-          (
+(define (rect-in-grid rect grid)
+            (local [(define rect_x (rect-x rect))
+                    (define rect_y (rect-y rect))
+                    (define rect_w (rect-w rect))
+                    (define rect_h (rect-h rect))
+                    (define (rect-in-grid-row/acc row x)
+                      (cond [(= x (+ rect_x rect_w))
+                             empty]
+                            [(and (>= x rect_x)
+                                  (< x (+ rect_x rect_w)))
+                             (cons (first row)
+                                   (rect-in-grid-row/acc (rest row) (add1 x)))]
+                            [else
+                             (rect-in-grid-row/acc (rest row) (add1 x))]))
+                    (define (rect-in-grid/acc grid y)
+                      (cond [(= y (+ rect_y rect_h)) empty]
+                            [(and (>= y rect_y)
+                                  (< y (+ rect_y rect_w)))
+                             (cons (rect-in-grid-row/acc (first grid) 0)
+                                   (rect-in-grid/acc (rest grid) (add1 y)))]
+                            [else
+                             (rect-in-grid/acc (rest grid) (add1 y))]))]
+              (rect-in-grid/acc grid 0)))
 
+(define (contains-used-row? rect grid)
+  (local [(define rectangle (rect-in-grid rect grid))]
+  (foldr (lambda (flst rlst)
+           (local [(define partial-result
+                     (foldr (lambda (f r)
+                              (cond [(false? (cell-used? f)) r]
+                                    [else true])) false flst))]
+             (cond [(false? partial-result) rlst]
+                   [else true])))
+         false rectangle)))
+
+(define (contains-one-number? rec)
+  (local [(define rectangle (rect-in-grid rect grid))]
+  (foldr (lambda (flst rlst)
+           (local [(define partial-result
+                     (foldr (lambda (f r)
+                              (cond [(and (not (zero? f)) r) false]
+                                    [else r])) flst))]
+             (cond [(false? partial-result) false]
+                   [else rlst]))))))
+
+(define (valid-rect? rect grid)
+  (local [(define rectangle (rect-in-grid rect grid))
+          (define (contains-used-cell? rec)
+            (foldr (lambda (flst rlst)
+                     (local [(define partial-result
+                               (foldr (lambda (f r)
+                                        (cond [(false? (cell-used? f)) r]
+                                              [else true])) flst))]
+                       (cond [(false? partial-result) rlst]
+                             [else true])))
+                   false rectangle))
+          (define (contains-one-number? rec)
+            (foldr (lambda (flst rlst)
+                     (local [(define partial-result
+                               (foldr (lambda (f r)
+                                        (cond [(and (not (zero? f)) r) false]
+                                              [else r])) flst))]
+                       (cond [(false? partial-result) false]
+                             [else rlst]))) false rectangle))] 
+                              
+
+           empty))
+    
+
+;;(define (valid-rec? rect grid)
+;;  (local [
+;;          (define (contains-used-row? rect row)
+;;            (cond [(
+;;          (define (contains-used? rect grid)
+;;            empty)
+; ;         (define (contains-more-than-one-number? rect grid)
+;;            empty)
+
+;;(rect-in-grid (make-rect 0 0 2 2) (state-grid first-unused-at-2-1))
 (define (neighbours state)
-  (
+  empty)
