@@ -1,0 +1,27 @@
+(draw 2 10 1 'R 55 45 1 0 10))
+
+(make-square135 55 45 10 '(0 0 0))
+(draw 3 10 1 'U 55 35 1 1 10)
+
+(make-square135 55 45 10 '(0 0 0))
+(make-square135 55 35 10 '(0 0 0))
+(draw 4 10 1 'L 45 35 2 0 10)
+
+(make-square135 55 45 10 '(0 0 0))
+(make-square135 55 35 10 '(0 0 0))
+(draw 5 10 2 'L 35 35 2 0 10)
+
+(make-square135 55 45 10 '(0 0 0))
+(make-square135 55 35 10 '(0 0 0))
+(make-square135 35 35 10 '(0 0 0))
+(draw 6 10 1 'D 35 25 2 1 10)
+
+(make-square135 55 45 10 '(0 0 0))
+(make-square135 55 35 10 '(0 0 0))
+(make-square135 35 35 10 '(0 0 0))
+(draw 7 10 2 'D 25 25 2 1 10)
+
+(make-square135 55 45 10 '(0 0 0))
+(make-square135 55 35 10 '(0 0 0))
+(make-square135 35 35 10 '(0 0 0))
+(make-square135 25 25 )

@@ -1,0 +1,121 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname moretabular) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+(require test-engine/racket-tests)
+
+
+;; A Table is a (listof (listof Num))
+;; requires: each sub-list has the same length
+
+
+;; Useful constants for examples and testing
+(define sample-table '((7 4.5 -3.2) (-3 3 13)))
+(define sample-list-function
+    (list abs floor add1))
+(define sample-table-function-application
+    (list (list (list 7 4.5 3.2)
+                (list 3 3 13))
+          (list (list 7 4 -4)
+                (list -3 3 13))
+          (list (list 8 5.5 -2.2)
+                (list -2 4 14))))
+
+
+;; =============== (A) =================
+;; (mirror table) consumes table and reverses the elements of 
+;;   each row.
+;; mirror: Table -> Table
+;; Examples
+(check-expect (mirror '((-3.2 4.5 7) (13 3 -3)))
+              (list (list 7 4.5 -3.2) (list -3 3 13)))
+(check-expect (mirror empty) empty)
+
+(define (mirror table)
+    (local
+        [(define (mirror-row/acc row reverse)
+            (cond [(empty? row) reverse]
+                  [else 
+                     (mirror-row/acc (rest row)
+                     (cons (first row) reverse))]))
+         (define (mirror-table table)
+            (cond [(empty? table) empty]
+                  [else
+                    (cons (mirror-row/acc (first table) empty)
+                          (mirror-table (rest table)))]))]
+        (mirror-table table))    
+    )
+
+;; Tests
+(check-expect (mirror '((-3.2 4.5 7 100) (80 13 3 -3)))
+              (list (list 100 7 4.5 -3.2) (list -3 3 13 80)))
+(check-expect (mirror empty) empty)
+
+
+;; ====================== (B) =========================
+;; (element-apply-many lof table) consumes lof, a list of functins,
+;;   and table, and produces a list of tables.
+;; element-apply-many: (listof (anyof (Num -> Num) (Num -> Int) 
+;;                     (Num -> Nat)) Table -> (listof Table)
+;; Example
+(check-expect (element-apply-many empty sample-table) empty)
+(check-expect (element-apply-many sample-list-function empty)
+              (list empty empty empty))
+(check-expect (element-apply-many sample-list-function sample-table)
+              sample-table-function-application)
+
+(define (element-apply-many lof table)
+    (local
+        [(define (apply-row function row)
+            (cond [(empty? row) empty]
+                  [else
+                      (cons (function (first row))
+                            (apply-row function (rest row)))]))
+         (define (apply-table function table)
+            (cond [(empty? table) empty]
+                  [else
+                      (cons (apply-row function (first table))
+                            (apply-table function (rest table)))]))]
+        (cond [(empty? lof) empty]
+              [else
+                  (cons (apply-table (first lof) table)
+                        (element-apply-many (rest lof) table))])))
+
+;; Tests
+(check-expect (element-apply-many empty sample-table) empty)
+(check-expect (element-apply-many sample-list-function empty)
+              (list empty empty empty))
+(check-expect (element-apply-many sample-list-function sample-table)
+              sample-table-function-application)
+
+
+;; =================== (C) =======================
+;; (scale-smallest table offset) consumes table and offset, and
+;;   produces a second function that consumes a number, multiplies
+;;   that number by the smallest element of the table, and adds
+;;   the offset.
+;; scale-smallest: Table Num -> (Num -> Num)
+;; requires: table is nonempty
+;; Examples
+
+(define (scale-smallest table offset)
+    (local 
+        [(define (row-min/acc row min-so-far)
+            (cond [(empty? row) min-so-far]
+                  [(< (first row) min-so-far)
+                   (row-min/acc (rest row) (first row))]
+                  [else 
+                   (row-min/acc (rest row) min-so-far)]))
+         (define (table-min/acc table min-so-far)
+            (cond [(empty? table) min-so-far]
+                  [else
+                      (table-min/acc (rest table)
+                                    (local [(define row-min (row-min/acc (first table)))]
+                                        (cond [(< row-min min-so-far) row-min]
+                                              [else min-so-far])))]))
+        (define (output-function num)
+            (+ (* num (table-min/acc table)) offset))]
+        output-function))
+
+((scale-smallest sample-table 2.4) 7)
+
+(test)

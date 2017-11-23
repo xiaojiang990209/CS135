@@ -1,0 +1,79 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname ulam) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(require "drawinglib.rkt")
+
+(define (change-direction dir)
+  (cond [(symbol=? dir 'R) 'U]
+        [(symbol=? dir 'U) 'L]
+        [(symbol=? dir 'L) 'D]
+        [(symbol=? dir 'D) 'R]
+        [else
+         (error "Invalid direction")]))
+
+(define (compute-cur-x dir cur-x length)
+  (cond [(symbol=? dir 'R) (+ cur-x length)]
+        [(symbol=? dir 'L) (- cur-x length)]
+        [else cur-x]))
+
+
+(define (compute-cur-y dir cur-y length)
+  (cond [(symbol=? dir 'U) (- cur-y length)]
+        [(symbol=? dir 'D) (+ cur-y length)]
+        [else cur-y]))
+
+(define (prime? n)
+  (prime-helper? 2 n))
+
+(define (prime-helper? start end)
+  (cond [(= end start) true]
+        [(zero? end) false]
+        [(= end 1) false]
+        [(= 0 (remainder end start)) false]
+        [else (prime-helper? (add1 start) end)]))
+
+
+(define (draw n end steps cur-x cur-y dir stepcounter add-step-counter length)
+  (cond [(= n end) empty]
+        [(prime? n)
+         (cons (make-square135 (make-posn cur-x cur-y) length '(0 0 0))
+               ;; Change direction, change # of steps
+               (cond [(and (= stepcounter steps) (= add-step-counter 1))
+                      (draw (add1 n) end 1 
+                            (compute-cur-x (change-direction dir) cur-x length)
+                            (compute-cur-y (change-direction dir) cur-y length)
+                            (change-direction dir) (add1 stepcounter) 0 length)]
+                     ;; Change direction
+                     [(= stepcounter steps)
+                      (draw (add1 n) end 1 
+                            (compute-cur-x (change-direction dir) cur-x length)
+                            (compute-cur-y (change-direction dir) cur-y length)
+                            (change-direction dir) stepcounter (add1 add-step-counter) length)]
+                     ;; Does not change direction, does not change # of steps
+                     [else (draw (add1 n) end (add1 steps) dir
+                                 (compute-cur-x dir cur-x length)
+                                 (compute-cur-y dir cur-y length)
+                                 stepcounter add-step-counter length)]))]
+        ;; Change direction, change # of steps
+        [(and (= stepcounter steps) (= add-step-counter 1))
+         (draw (add1 n) end 1 (change-direction dir)
+               (compute-cur-x (change-direction dir) cur-x length)
+               (compute-cur-y (change-direction dir) cur-y length)
+               (add1 stepcounter) 0 length)]
+        ;; Change direction
+        [(= stepcounter steps)
+         (draw (add1 n) end 1 (change-direction dir)
+               (compute-cur-x (change-direction dir) cur-x length)
+               (compute-cur-y (change-direction dir) cur-y length)
+               stepcounter (add1 add-step-counter) length)]
+        ;; Does not change direction, does not change # of steps
+        [else (draw (add1 n) end (add1 steps) dir
+                    (compute-cur-x dir cur-x length)
+                    (compute-cur-y dir cur-y length)
+                    stepcounter add-step-counter length)]))
+
+(define (ulam-spiral num-row-column side-length)
+  (draw 1 (add1 (sqr num-row-column)) 0 'R
+        (- (/ (* num-row-column side-length) 2) 5)
+        (- (/ (* num-row-column side-length) 2) 5)
+        1 0 side-length))

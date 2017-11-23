@@ -1,0 +1,214 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname anagrams) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Zijie Jiang (20714726)
+;; CS135 Fall 2017
+;; Assignment 06, Problem 2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; Data definition for AL
+;; An AL is one of:
+;; * empty
+;; * (cons (list Any Nat) AL)
+
+
+;; Useful constants for examples and testing
+(define order (list #\o #\r #\d #\e #\r)) 
+(define sorted-order (list #\d #\e #\o #\r #\r))
+(define listen (list #\l #\i #\s #\t #\e #\n))
+(define sorted-listen (list #\e #\i #\l #\n #\s #\t))
+(define freq-count-order
+  (list (list #\o 1) (list #\r 2) (list #\d 1) (list #\e 1)))
+
+
+;; =========================== (A) ==============================
+;; (insert char loc) inserts char into the appropriate location
+;;   in loc, while still maintaining loc to be in an increasing
+;;   order
+;; insert: Char (listof Char) -> (listof Char)
+;; Example
+(check-expect (insert #\g sorted-order)
+              (list #\d #\e #\g #\o #\r #\r))
+
+(define (insert char loc)
+  (cond [(empty? loc) (cons char empty)]
+        [(char<? char (first loc))
+         (cons char loc)]
+        [else
+         (cons (first loc) (insert char (rest loc)))]))
+
+
+;; (sort-chars loc) produces the sorted version of loc, in
+;;   increasing order.
+;; sort-chars: (listof Char) -> (listof Char)
+;; Examples
+(check-expect (sort-chars empty) empty)
+(check-expect (sort-chars order) sorted-order)
+
+(define (sort-chars loc)
+  (cond [(empty? loc) empty]
+        [else (insert (first loc)
+                      (sort-chars (rest loc)))]))
+
+;; Tests
+(check-expect (sort-chars empty) empty)
+(check-expect (sort-chars listen) sorted-listen)
+
+
+;; =========================== (B) ==============================
+;; (anagrams/sort? string1 string2) produces true if string1 and
+;;   string2 are anagrams of each other, and false otherwise
+;; anagrams/sort?: Str Str -> Bool
+;; Example
+(check-expect (anagrams/sort? "" "") true)
+(check-expect (anagrams/sort? "hello" "") false)
+(check-expect (anagrams/sort? "" "lalala") false)
+(check-expect (anagrams/sort? "listen" "slient") true)
+
+(define (anagrams/sort? string1 string2)
+  (equal? (sort-chars (string->list string1))
+          (sort-chars (string->list string2))))
+
+;; Tests
+(check-expect (anagrams/sort? "" "") true)
+(check-expect (anagrams/sort? "hi" "") false)
+(check-expect (anagrams/sort? "" "hi") false)
+(check-expect (anagrams/sort? "eleven plus two" "twelve plus one") true)
+
+
+;; =========================== (C) ==============================
+;; (make-AL-elem elem n) creates a specific element of the form
+;;   (list elem n) to be added to the Association List
+;; make-AL-elem: Any Nat -> (list Any Nat)
+;; Example
+(check-expect (make-AL-elem 'red 1) (list 'red 1))
+
+(define (make-AL-elem elem n)
+  (list elem n))
+
+
+;; (add-to-AL elem AL) adds elem to the AL. If elem exists in AL, we
+;;    increment the second element (counter) of that existing element,
+;;    or creates a (list elem 1) and adds it to AL if elem is not
+;;    already in AL.
+;; add-to-AL: Any AL -> AL
+;; Example
+(check-expect (add-to-AL 9 '((9 1))) '((9 2)))
+
+(define (add-to-AL elem AL)
+  (cond [(empty? AL) (cons (make-AL-elem elem 1) empty)]
+        [(equal? (first (first AL)) elem)
+         (cons (make-AL-elem (first (first AL))
+                             (add1 (second (first AL))))
+               (rest AL))]
+        [else
+         (cons (first AL) (add-to-AL elem (rest AL)))]))
+
+
+;; (freq-count/acc list AL) counts the frequencies of each element in
+;;    and stores the element-frequency pair in AL
+;; freq-count/acc: (listof Any) AL -> AL
+
+(define (freq-count/acc list AL)
+  (cond [(empty? list) AL]
+        [else
+         (freq-count/acc (rest list)
+                         (add-to-AL (first list) AL))]))
+
+
+;; (freq-count list) produces a list of pairs, where the first element
+;;   of each pair is an element from the list and the second element
+;;   of each pair is the number of times that element appeared in the
+;;   consumed list.
+;; freq-count: (listof Any) -> AL
+;; Examples
+(check-expect (freq-count empty) empty)
+(check-expect (freq-count order) freq-count-order)
+
+(define (freq-count list)
+  (freq-count/acc list empty))
+
+;; Tests
+(check-expect (freq-count empty) empty)
+(check-expect (freq-count '(red 7 9 (7 9) red 9))
+              '((red 2) (7 1) (9 2) ((7 9) 1)))
+
+
+;; =========================== (D) ==============================
+;; (match? elem list) produces true if elem exists in list, and
+;;   false otherwise.
+;; match?: Any (listof Any) -> Bool
+;; Example
+(check-expect (match? 3 '(1 2 3)) true)
+
+(define (match? elem list)
+  (cond [(empty? list) false]
+        [(equal? elem (first list)) true]
+        [else (match? elem (rest list))]))
+
+
+;; (freq-equiv-one-dir? AL1 AL2) produces true if all elements
+;;    in AL1 exists in AL2, and false otherwise
+;; freq-equiv-one-dir?: AL AL -> Bool
+;; requires: There are at most one occurence of each "key" of
+;;           AL1, AL2, which is the Any of (list Any Nat)
+;; Example
+(check-expect (freq-equiv? '((red 5) (blue 9) ("string" 0))
+                           '((blue 9) (red 5) ("string" 0)))
+              true)
+
+(define (freq-equiv-one-dir? AL1 AL2)
+  (cond [(empty? AL1) true]
+        [(not (match? (first AL1) AL2)) false]
+        [else (freq-equiv-one-dir? (rest AL1) AL2)]))
+
+
+;; (freq-equiv? AL1 AL2) produces true if AL1 and AL2 are
+;;    rearrangements of each other, and false otherwise
+;; freq-equiv?: AL AL -> Bool
+;; requires: There are at most one occurence of each "key" of
+;;           AL1, AL2, which is the Any of (list Any Nat)
+;; Examples
+(check-expect (freq-equiv? empty empty) true)
+(check-expect (freq-equiv? empty '((1 2))) false)
+(check-expect (freq-equiv? '((1 2)) empty) false)
+(check-expect (freq-equiv? '((red 5) (blue 9) ("string" 0))
+                           '((blue 9) (red 5) ("string" 0)))
+              true)
+
+(define (freq-equiv? AL1 AL2)
+  (and (freq-equiv-one-dir? AL1 AL2)
+       (freq-equiv-one-dir? AL2 AL1)))
+
+;; Tests
+(check-expect (freq-equiv? empty empty) true)
+(check-expect (freq-equiv? empty '(1 2)) false)
+(check-expect (freq-equiv? '(1 2) empty) false)
+(check-expect (freq-equiv? '((red 5) (blue 6))
+                           '((blue 5) (red 6)))
+              false)
+(check-expect (freq-equiv? '((blue 5)) '((red 4) (blue 5))) false)
+
+
+;; =========================== (E) ==============================
+;; (anagrams/count? string1 string2) produces true if string1 and
+;;   string2 are anagrams of each other, and false otherwise
+;; anagrams/count?: Str Str -> Bool
+;; Examples
+(check-expect (anagrams/count? "" "") true)
+(check-expect (anagrams/count? "" "hello") false)
+(check-expect (anagrams/count? "bonjour" "") false)
+(check-expect (anagrams/count? "listen" "silent") true)
+
+(define (anagrams/count? string1 string2)
+  (freq-equiv? (freq-count (string->list string1))
+               (freq-count (string->list string2))))
+
+;; Tests
+(check-expect (anagrams/count? "" "") true)
+(check-expect (anagrams/count? "" "hi") false)
+(check-expect (anagrams/count? "hi" "") false)
+(check-expect (anagrams/count? "eleven plus two"
+                               "twelve plus one") true)

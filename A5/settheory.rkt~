@@ -1,0 +1,114 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname settheory) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+;; A NumSet is a (listof Num)
+;; requires: the numbers are strictly increasing
+
+;; (A)
+;; (union set1 set2) consumes set1, set2 and produces a single
+;;   NumSet containing all the numbers that are in either of
+;;   set1 or set2.
+;; union: NumSet NumSet -> NumSet
+;; Example:
+(check-expect (union (list 1 2 3 6) (list 1 3 4))
+              (list 1 2 3 4 6))
+
+(define (union set1 set2)
+  (cond [(empty? set1) set2]
+        [(empty? set2) set1]
+        [(< (first set1) (first set2))
+         (cons (first set1) (union (rest set1) set2))]
+        [(> (first set1) (first set2))
+         (cons (first set2) (union set1 (rest set2)))]
+        [else
+         (cons (first set1) (union (rest set1) (rest set2)))]))
+
+;; Tests
+(check-expect (union empty empty) empty)
+(check-expect (union (list 1 2 3) empty)
+              (list 1 2 3))
+(check-expect (union empty (list 2 4 6 8))
+              (list 2 4 6 8))
+
+
+;; (B)
+;; (intersection set1 set2) consumes set1, set2 and produces a
+;;   single NumSet containing all the numbers that are in both
+;;   set1 and set2.
+;; intersection: NumSet NumSet -> NumSet
+;; Example:
+(check-expect (intersection (list 1 2 3 6) (list 1 3 4))
+              (list 1 3))
+
+(define (intersection set1 set2)
+  (cond [(empty? set1) empty]
+        [(empty? set2) empty]
+        [(= (first set1) (first set2))
+         (cons (first set1)
+               (intersection (rest set1) (rest set2)))]
+        [(< (first set1) (first set2))
+         (intersection (rest set1) set2)]
+        [(> (first set1) (first set2))
+         (intersection set1 (rest set2))]))
+
+;; Tests
+(check-expect (intersection (list 1 2 3) empty)
+              empty)
+(check-expect (intersection empty (list 1 2 3))
+              empty)
+(check-expect (intersection (list 2 3 4 6 8) (list 1 2 3 4 5 6 7))
+              (list 2 3 4 6))
+
+
+;; (C)
+;; (difference set1 set2) consumes set1, set2 and produces a
+;;   single NumSet containing all the numbers that are in set1
+;;   but not in set2
+;; difference: NumSet NumSet -> NumSet
+;; Example:
+(check-expect (difference (list 1 3 4 5) (list 1 2 3))
+              (list 4 5))
+(check-expect (difference (list 1 2 3) (list 4 5 6))
+              (list 1 2 3))
+
+(define (difference set1 set2)
+  (cond [(empty? set1) empty]
+        [(empty? set2) set1]
+        [(= (first set1) (first set2))
+         (difference (rest set1) (rest set2))]
+        [(> (first set1) (first set2))
+         (difference set1 (rest set2))]
+        [else
+         (cons (first set1) (difference (rest set1) set2))]))
+
+;; Tests
+(check-expect (difference empty (list 1 2 3)) empty)
+(check-expect (difference (list 1 2 3) empty) (list 1 2 3))
+(check-expect (difference (list 1 2 3) (list 1 2 3)) empty)
+(check-expect (difference (list 4 5 6) (list 1 2 3)) (list 4 5 6))
+
+
+;; (D)
+;; (symmetric-difference set1 set2) consumes set1, set2 and
+;;   produces a single NumSet containing all the numbers that
+;;   are in set1 or set2, but not in both set1 and set2.
+;; symmetric-difference: NumSet NumSet -> NumSet
+;; Example:
+(check-expect (symmetric-difference (list 1 2 3 4 5 6)
+                                    (list 4 5 6 7 8 9))
+              (list 1 2 3 7 8 9))
+
+(define (symmetric-difference set1 set2)
+  (difference (union set1 set2)
+              (intersection set1 set2)))
+
+;; Tests
+(check-expect (symmetric-difference (list 1 2 3 4 5 6)
+                                    (list 1 4 5 6))
+              (list 2 3))
+(check-expect (symmetric-difference (list 4 5 6)
+                                    (list 4 5 6))
+              empty)
+(check-expect (symmetric-difference (list 1 3 5)
+                                    (list 2 4 6))
+              (list 1 2 3 4 5 6))

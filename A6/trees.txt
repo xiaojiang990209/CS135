@@ -1,0 +1,16 @@
+(define exampleBT
+  (make-node 1 "a"
+             (make-node 7 "b" empty empty)
+             (make-node 3 "c" (make-node 7 "d" empty empty) empty)))
+(define root
+  (make-node 1 "a" empty empty))
+(define exampleBT-pruned-at-7
+  (make-node 1 "a" empty 
+                   (make-node 3 "c" empty empty)))
+(check-expect (height empty) 0)
+(check-expect (height root) 1)
+(check-expect (find-in-tree exampleBT empty) 1)
+(check-expect (find-in-tree exampleBT '(L L)) false)
+(check-expect (prune empty 1) empty)
+(check-expect (prune exampleBT 7)
+              exampleBT-pruned-at-7)

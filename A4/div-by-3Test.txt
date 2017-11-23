@@ -1,0 +1,5 @@
+(check-expect (div-by-3? 9) true)
+(check-expect (div-by-3? 0) true)
+(check-expect (div-by-3? 1) false)
+(check-expect (div-by-3? 2) false)
+(check-expect (div-by-3? 8) false)

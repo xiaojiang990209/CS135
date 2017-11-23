@@ -1,0 +1,41 @@
+(define sample-table
+  (list (list 8 3 4 9) (list 3 7 5 6) (list -1 1 -3 0)))
+(define sample-table-mult-by-2
+  (list (list 16 6 8 18) (list 6 14 10 12) (list -2 2 -6 0)))
+(define sample-table-2nd-row
+  (list 3 7 5 6))
+(define sample-table-2nd-column
+  (list 3 7 1))
+(define sample-table-3rd-column
+  (list 4 5 -3))
+(define sample-table2
+  (list (list 2 8) (list 4 6)))
+(define sample-table2-mult-by-0.5
+  (list (list 1 4) (list 2 3)))
+(define sample-list
+  (list 1 2 3 4 5))
+(define sample-list-mult-by-2
+  (list 2 4 6 8 10))
+(define sample-table3
+  (list (list 2 2 2 2) (list 2 2 2 2) (list 2 2 2 2)))
+(define sum-sample-table-1-3
+  (list (list 10 5 6 11) (list 5 9 7 8) (list 1 3 -1 2)))
+(define negate-sample-table
+  (list (list -8 -3 -4 -9) (list -3 -7 -5 -6) (list 1 -1 3 0)))
+(define zero-table
+  (list (list 0 0 0 0) (list 0 0 0 0) (list 0 0 0 0)))
+
+(check-expect (mult-by 3 empty) empty)
+(check-expect (mult-by 3 (list empty)) (list empty))
+(check-expect (mult-by 0.5 sample-table2)
+              sample-table2-mult-by-0.5)
+(check-expect (get-elem 0 0 empty) false)
+(check-expect (get-elem 3 0 sample-table) false)
+(check-expect (get-elem 0 4 sample-table) false)
+(check-expect (get-elem 2 3 sample-table) 0)
+(check-expect (col 2 empty) empty)
+(check-expect (col 5 sample-table) empty)
+(check-expect (col 1 sample-table) sample-table-2nd-column)
+(check-expect (sum-tables empty empty) empty)
+(check-expect (sum-tables sample-table negate-sample-table)
+              zero-table)

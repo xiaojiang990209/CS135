@@ -1,0 +1,160 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname p1) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(define-struct binode (op arg1 arg2))
+
+;; A BinExp is one of
+;; * Num
+;; * BINode
+
+(define (my-binexp-fn ex)
+  (cond [(number? ex) ...]
+        [else
+         (... (binode-op ex) ...
+              (my-binexp-fn (binode-arg1 ex))
+              (my-binexp-fn (binode-arg2 ex)))]))
+
+(define (calc-answer op num1 num2)
+  (cond [(symbol=? op '+)
+         (+ num1 num2)]
+        [(symbol=? op '-)
+         (- num1 num2)]
+        [(symbol=? op '*)
+         (* num1 num2)]
+        [(symbol=? op '/)
+         (/ num1 num2)]
+        [else
+         (error "Invalid operator")]))
+
+(define (eval ex)
+  (cond [(number? ex) ex]
+        [else
+         (calc-answer (binode-op ex)
+                      (eval (binode-arg1 ex))
+                      (eval (binode-arg2 ex)))]))
+
+;; A Taxon is one of:
+;; * Modern
+;; * Ancient
+
+(define-struct modern (name pop))
+;; A Modern is a (make-modern Str Nat)
+(define-struct ancient (name age left right))
+;; An Ancient is a (make-ancient Str Nat Taxon Taxon)
+
+(define human (make-modern "human" 6.8e9))
+(define chimp (make-modern "chimpanzee" 1.0e5))
+(define rat (make-modern "rat" 1.0e9))
+(define chicken (make-modern "chicken" 1.5e10))
+(define worm (make-modern "worm" 5.0e10))
+(define fruitfly (make-modern "fruit fly" 1.0e11))
+(define primate (make-ancient "Primate" 5 human chimp))
+(define mammal (make-ancient "Mammal" 65 primate rat))
+(define vertebrate
+  (make-ancient "Vertebrate" 320 mammal chicken))
+(define invertebrate
+  (make-ancient "Invertebrate" 530 worm fruitfly))
+(define animal (make-ancient "Animal" 535 vertebrate invertebrate))
+
+;; my-taxon-fn: Taxon -> Any
+(define (my-taxon-fn taxon)
+  (cond [(modern? taxon) (my-modern-fn taxon)]
+        [(ancient? taxon) (my-ancient-fn taxon)]))
+
+;; my-modern-fn: Modern -> Any
+(define (my-modern-fn modern)
+  ( ... (modern-name modern) ...
+        (modern-pop modern) ...))
+
+;; my-ancient-fn: Ancient -> Any
+(define (my-ancient-fn ancient)
+  ( ... (ancient-name ancient) ...
+        (ancient-age ancient) ...
+        (my-taxon-fn (ancient-left ancient)) ...
+        (my-taxon-fn (ancient-right ancient)) ...))
+
+;; count-modern: Taxon -> Nat
+(define (count-modern taxon)
+  (cond [(modern? taxon) 1]
+        [else
+         (+ (count-modern (ancient-left taxon))
+            (count-modern (ancient-right taxon)))]))
+
+
+;; (recent-events t n) produces the number of evolution events in t
+;;   taking place within the last n million years
+;; recent-events: Taxon Nat -> Nat
+(define (recent-events t n)
+  (cond [(modern? t) 0]
+        [(> n (ancient-age t)) 0]
+        [else
+         (+ (recent-events (ancient-left t) n)
+            (recent-events (ancient-right t) n))]))
+
+
+
+(define (ancestors from to)
+  (cond [(modern? from) (ancestors-modern from to)] 
+        [(ancient? from) (ancestors-ancient from to)]))
+
+(define (ancestors-modern from to)
+  (cond [(string=? (modern-name from) (modern-name to))
+         (cons (modern-name from) empty)]
+        [else false]))
+
+(define (ancestors-ancient from to)
+  (pick-list (ancient-name from)
+             (ancestors (ancient-left from) to)
+             (ancestors (ancient-right from) to)))
+
+
+(define (pick-list name left right)
+  (cond [(cons? left) (cons name left)]
+        [(cons? right) (cons name right)]
+        [else false]))
+
+(define node (key val left right))
+;; A Node is a (make-node Num Str BT BT)
+
+;; A BT is one of:
+;; * empty
+;; * Node
+
+;; my-bt-fn: BT -> Any
+(define (my-bt-fn bt)
+  (cond [(empty? bt) ...]
+        [else
+         ( ... (node-key bt) ...
+               (node-val bt) ...
+               (my-bt-fn (node-left bt)) ...
+               (my-bt-fn (node-right bt)) ...)]))
+
+
+(define (count-value v bt)
+  (cond [(empty? bt) 0]
+        [else
+         (+ (cond [(= (node-val bt) v) 1]
+                  [else 0])
+            (count-value v (node-left bt))
+            (count-value v (node-right bt)))]))
+
+(define (add-1-to-key bt)
+  (cond [(empty? bt) empty]
+        [else
+         (make-node (add1 (node-key bt))
+                    (node-val bt)
+                    (add-1-to-key (node-left bt))
+                    (add-1-to-key (node-right bt)))]))
+
+(define (pick-string a b)
+  (cond [(string? a) a]
+        [(string? b) b]
+        [else false]))
+
+(define (search-bt n bt)
+  (cond [(empty? bt) false]
+        [(= (node-key bt) n)
+         (node-val bt)]
+        [else
+         (pick-string (search-bt n (node-left bt))
+                      (search-bt n (node-right bt)))]))

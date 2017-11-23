@@ -1,0 +1,107 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname ca) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CS135 Fall 2017
+;; Zijie Jiang (20714726)
+;; Assignment 9, Question 1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; Useful constants for examples and testing
+(define sample-current-row
+  '(0 1 1 0 0 0 1 1 0 1 0 0 1 0 1 1 0 0
+    0 0 0 1 1 1 1 1 0 1 0 0 1 0 0 1 0 0))
+(define sample-next-row
+  '(1 0 1 1 0 1 0 1 0 1 1 1 1 0 0 1 1 0
+    0 0 1 0 0 0 0 1 0 1 1 1 1 1 1 1 1 0))
+(define sample-rule 86)
+
+
+;; ================= (a) =====================
+;; (apply-rule a b c r) consumes four natural numbers a, b, c, r.
+;;   and applies the given CA rule encoded in r and produce either
+;;   0 or 1 to indicate whether the resulting square should be
+;;   black or white.
+;; apply-rule: (anyof 0 1) (anyof 0 1) (anyof 0 1) Nat -> (anyof 0 1)
+;; requires: 0 <= r <= 255
+;; Example
+(check-expect (apply-rule 1 1 1 86) 0)
+(check-expect (apply-rule 1 1 0 86) 1)
+(check-expect (apply-rule 1 0 1 86) 0)
+(check-expect (apply-rule 1 0 0 86) 1)
+(check-expect (apply-rule 0 1 1 86) 0)
+(check-expect (apply-rule 0 1 0 86) 1)
+(check-expect (apply-rule 0 0 1 86) 1)
+(check-expect (apply-rule 0 0 0 86) 0)
+
+
+(define (apply-rule a b c r)
+  (local [(define sum (+ (* 4 a) (* 2 b) (* 1 c)))]
+    (cond [(odd? (floor (/ r (expt 2 sum)))) 1]
+          [else 0])))
+
+;; Test
+(check-expect (apply-rule 1 1 1 0) 0)
+(check-expect (apply-rule 0 0 0 255) 1)
+
+
+;; ========================== (b) =============================
+;; (next-row current-row rule) consumes current-row (CA Row) and a
+;;   rule (CA rule), and produces a new list of 0s and 1s by applying
+;;   rule to current-row.
+;; next-row: (listof (anyof 0 1)) Nat -> (listof (anyof 0 1))
+;; requires: 0 <= rule <= 255
+;;           current-row is non-empty
+;; Examples
+(check-expect (next-row sample-current-row sample-rule)
+              sample-next-row)
+
+(define (next-row current-row rule)
+  (build-list (length current-row)
+              (lambda (i)
+                (cond [(zero? i)
+                       (apply-rule 0 (list-ref current-row i)
+                                   (list-ref current-row (add1 i))
+                                   rule)]
+                      [(= (sub1 (length current-row)) i)
+                       (apply-rule (list-ref current-row (sub1 i))
+                                   (list-ref current-row i) 0
+                                   rule)]
+                      [else
+                       (apply-rule (list-ref current-row (sub1 i))
+                                   (list-ref current-row i)
+                                   (list-ref current-row (add1 i))
+                                   rule)]))))
+
+
+;; ==================== (c) =========================
+;; (iterate f b n) consumes a function f, a base value b,
+;;   and a natural number n, and produces a list of length
+;;   n containing (b, f(b), f(f(b)),...,f^(n-1)(b))
+;; iterate: (X -> Y) X Nat -> (listof Y)
+;; Examples
+(check-expect (iterate sqr 2 4) '(2 4 16 256))
+
+(define (iterate f b n)
+  (cond [(zero? n) empty]
+        [else
+         (cons b (iterate f (f b) (sub1 n)))]))
+
+;; Tests
+(check-expect (iterate add1 2 5) '(2 3 4 5 6))
+(check-expect (iterate sqrt 256 4) '(256 16 4 2))
+
+
+;; ====================== (d) ============================
+;; (run-automation initial-row rule n) consumes a non-empty
+;;   initial-row, a CA rule, and n representing number of
+;;   generations, and produces a list of n lists representing
+;;   the initial-row's transformation from the applicaiton of rule
+;; run-automation: (listof (anyof 0 1)) Nat Nat
+;;                 -> (listof (listof (anyof 0 1))
+;; requires: 0 <= rule <= 255
+;;           initial-row is non-empty
+
+(define (run-automation initial-row rule n)
+  (iterate (lambda (row) (next-row row rule)) initial-row n))
