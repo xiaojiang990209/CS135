@@ -47,7 +47,40 @@
                    (0 0 0 0 0 0 0 0 0 0 0 24 0)
                    (0 0 0 0 4 0 4 0 0 0 4 0 0)
                    (0 0 3 0 0 0 0 0 0 0 8 0 2)))
-
+(define puzz-soln
+  (list
+   (make-rect 5 5 2 2)
+   (make-rect 4 5 1 2)
+   (make-rect 1 5 3 2)
+   (make-rect 0 5 1 2)
+   (make-rect 0 4 4 1)
+   (make-rect 5 3 2 2)
+   (make-rect 5 2 2 1)
+   (make-rect 4 2 1 3)
+   (make-rect 4 1 2 1)
+   (make-rect 2 1 2 3)
+   (make-rect 1 1 1 3)
+   (make-rect 6 0 1 2)
+   (make-rect 1 0 5 1)
+   (make-rect 0 0 1 4)))
+(define sample-puzzle1
+  '((0 0 1)
+    (2 2 1)
+    (1 1 1)))
+(define sample-puzzle1-state
+  (make-state
+   (list (list
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 1 false))
+         (list
+          (make-cell 2 false)
+          (make-cell 2 false)
+          (make-cell 1 false))
+         (list
+          (make-cell 1 false)
+          (make-cell 1 false)
+          (make-cell 1 false))) empty))
 (define first-unused-at-2-1
   (make-state
    (list (list
@@ -62,31 +95,150 @@
           (make-cell 6 false)
           (make-cell 7 false)
           (make-cell 8 false))) empty))
-
-(define state1
+(define sample-state
   (make-state
    (list (list
           (make-cell 0 true)
           (make-cell 0 true)
-          (make-cell 2 true))
+          (make-cell 0 true)
+          (make-cell 2 true)
+          (make-cell 0 true)
+          (make-cell 2 true)
+          (make-cell 0 true))
          (list
           (make-cell 0 true)
-          (make-cell 4 true)
-          (make-cell 5 false))
+          (make-cell 0 true)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 4 false)
+          (make-cell 0 true))
          (list
+          (make-cell 0 true)
+          (make-cell 3 true)
           (make-cell 6 false)
-          (make-cell 7 false)
-          (make-cell 8 false))) empty))
-
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 true))
+         (list
+          (make-cell 4 true)
+          (make-cell 2 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 4 false)
+          (make-cell 0 true))
+         (list
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 2 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 true))
+         (list
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 10 false)
+          (make-cell 0 false)
+          (make-cell 7 true))
+         (list
+          (make-cell 3 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 true)))
+   empty))
+(define 2x2-puzz1
+  '((2 0)
+    (0 2)))
+(define 2x2-puzz1-neighbour
+  (list
+   (make-state
+    (list (list
+           (make-cell 2 true)
+           (make-cell 0 true))
+          (list
+           (make-cell 0 false)
+           (make-cell 2 false)))
+    (list (make-rect 0 0 2 1)))
+   (make-state
+    (list (list
+           (make-cell 2 true)
+           (make-cell 0 false))
+          (list
+           (make-cell 0 true)
+           (make-cell 2 false)))
+    (list (make-rect 0 0 1 2)))))
+(define 2x2-puzz1-soln 
+  (list (make-rect 0 1 2 1)
+        (make-rect 0 0 2 1)))
+(define 2x2-puzz2
+  '((0 0)
+    (4 0)))
+(define 2x2-puzz2-soln
+  (list (make-rect 0 0 2 2)))
+(define 3x3-puzz
+  '((3 0 2)
+    (0 2 0)
+    (0 2 0)))
+(define 3x3-puzz-neighbour
+  (list
+   (make-state
+    (list (list
+           (make-cell 3 true)
+           (make-cell 0 false)
+           (make-cell 2 false))
+          (list
+           (make-cell 0 true)
+           (make-cell 2 false)
+           (make-cell 0 false))
+          (list
+           (make-cell 0 true)
+           (make-cell 2 false)
+           (make-cell 0 false)))
+    (list (make-rect 0 0 1 3)))))
+(define 3x3-puzz-soln
+  (list (make-rect 1 2 2 1)
+        (make-rect 1 1 2 1)
+        (make-rect 1 0 2 1)
+        (make-rect 0 0 1 3)))
+(define 4x4-puzz
+  '((4 0 4 0)
+    (0 0 0 0)
+    (4 0 4 0)
+    (0 0 0 0)))
+(define 4x4-puzz-soln
+  (list (make-rect 2 2 2 2)
+        (make-rect 0 2 2 2)
+        (make-rect 2 0 2 2)
+        (make-rect 0 0 2 2)))
+(define unsolveable-puzz
+  '((0 0 0)
+    (0 1 0)
+    (0 0 0)))
+          
 
 ;; ====================== (A) ==========================
 ;; (map2d f nested-lst) consumes a function f and a list of lists
 ;;   of values nested-lst, and produces a new list of lists in which
 ;;   f has been applied to every element of the input.
 ;; map2d: (X > Y) (listof (listof X)) -> (listof (listof Y))
+;; Example
+(check-expect (map2d add1 '((0 1) (2 3))) '((1 2) (3 4)))
+(check-expect (map2d add1 empty) empty)
 
 (define (map2d f nested-lst)
-  (map (lambda (lst) (map (lambda (elem) (f elem)) lst)) nested-lst))
+  (map (lambda (lst) (map f lst)) nested-lst))
+
+;; Tests
+(check-expect (map2d add1 empty) empty)
+(check-expect (map2d sqr '((1 2) (3 4))) '((1 4) (9 16)))
 
 
 ;; ====================== (b) ===========================
@@ -94,10 +246,18 @@
 ;;   a State representing the initial state of a puzzle
 ;; construct-puzzle: (listof (listof Nat)) -> State
 ;; Examples
+(check-expect (construct-puzzle empty) (make-state empty empty))
+(check-expect (construct-puzzle sample-puzzle1)
+              sample-puzzle1-state)
 
 (define (construct-puzzle nested-lst)
   (make-state (map2d (lambda (elem) (make-cell elem false)) nested-lst)
               empty))
+
+;; Tests
+(check-expect (construct-puzzle empty) (make-state empty empty))
+(check-expect (construct-puzzle sample-puzzle1)
+              sample-puzzle1-state)
 
 
 ;; ====================== (c) ===========================
@@ -106,6 +266,8 @@
 ;;   fully solved
 ;; solved?: State -> Bool
 ;; Example
+(check-expect (solved? (make-state empty empty)) true)
+(check-expect (solved? first-unused-at-2-1) false)
 
 (define (solved? state)
   (foldr (lambda (flst rlst)
@@ -118,19 +280,39 @@
                    [else rlst])))
            true (state-grid state)))
 
+;; Tests
+(check-expect (solved? (make-state empty empty)) true)
+(check-expect (solved? sample-state) false)
+
 
 ;; ====================== (d) ===========================
 ;; (get-first-unused grid) consumes grid and finds the topmost,
 ;;   leftmost cell in the grid that isn't marked as used.
 ;; get-first-unused: Grid -> (list Nat Nat)
 ;; requires: grid has at least one unused cell
+;; Example
+(check-expect (get-first-unused (state-grid first-unused-at-2-1))
+              (list 2 1))
+(check-expect (get-first-unused (state-grid sample-state))
+              (list 2 1))
 
 (define (get-first-unused grid)
-  (local [(define (find-unused-row/acc row x)
+  (local [;; (find-unused-row/acc row x) produces the x-coordinate,
+          ;;   x, of the first unused-cell in the row.
+          ;; find-unused-row/acc: (listof Cell) Nat -> (anyof Nat false)
+          
+          (define (find-unused-row/acc row x)
             (cond [(empty? row) false]
                   [(not (cell-used? (first row))) x]
                   [else
                    (find-unused-row/acc (rest row) (add1 x))]))
+
+          ;; (find-unused-grid/acc grid y) produces the (x,y) pair
+          ;;   of the first unused cell of grid, using y as
+          ;;   accumulator.
+          ;; find-unused-grid/acc: Grid Nat
+          ;;                       -> (anyof false (list Nat Nat))
+          
           (define (find-unused-grid/acc grid y)
             (local [(define row-result (find-unused-row/acc (first grid) 0))]
               (cond [(false? row-result)
@@ -139,20 +321,29 @@
                      (list row-result y)])))]
     (find-unused-grid/acc grid 0)))
 
+;; Tests
+(check-expect (get-first-unused (state-grid first-unused-at-2-1))
+              (list 2 1))
+(check-expect (get-first-unused (state-grid sample-state))
+              (list 2 1))
+
 
 ;; ====================== (e) ===========================
-;; (neighbours state) consumes state and produces a list of
-;;   new states that might legitimately follow from the given
-;;   state after adding a single rectangle.
-;; neighbours: State -> (listof State)
-
-;; rect contains x y w h
+;; (rect-in-grid rect grid) returns the grid (nested list of cells)
+;;   defined by rect, in the grid parameter
+;; rect-in-grid: Rect Grid -> Grid
 
 (define (rect-in-grid rect grid)
             (local [(define rect_x (rect-x rect))
                     (define rect_y (rect-y rect))
                     (define rect_w (rect-w rect))
                     (define rect_h (rect-h rect))
+                    ;; (rect-in-grid-row/acc row x) produces the list
+                    ;;   of cells in row, defined by rect_x and
+                    ;;   rect_x + rect_w, using x as accumulator
+                    ;; rect-in-grid-row/acc: (listof Cell) Nat
+                    ;;                       -> (listof Cell)
+                    
                     (define (rect-in-grid-row/acc row x)
                       (cond [(= x (+ rect_x rect_w))
                              empty]
@@ -162,18 +353,35 @@
                                    (rect-in-grid-row/acc (rest row) (add1 x)))]
                             [else
                              (rect-in-grid-row/acc (rest row) (add1 x))]))
+
+                    ;; (rect-in-grid/acc grid y) produces the grid of
+                    ;;    cells in grid, defined by rect, using y as
+                    ;;    accumulator
+                    ;; rect-in-grid/acc: Grid Nat -> Grid
+                    
                     (define (rect-in-grid/acc grid y)
                       (cond [(= y (+ rect_y rect_h)) empty]
                             [(and (>= y rect_y)
-                                  (< y (+ rect_y rect_w)))
+                                  (< y (+ rect_y rect_h)))
                              (cons (rect-in-grid-row/acc (first grid) 0)
                                    (rect-in-grid/acc (rest grid) (add1 y)))]
                             [else
                              (rect-in-grid/acc (rest grid) (add1 y))]))]
               (rect-in-grid/acc grid 0)))
 
+
+;; (contains-used-cell? rect grid) produces true if the Rectangle
+;;   in grid, defined by rect, contains one or more used cell, and
+;;   false otherwise.
+;; contains-used-cell?: Rect Grid -> Bool
+
 (define (contains-used-cell? rect grid)
   (local [(define rectangle (rect-in-grid rect grid))
+          ;; (contains-used-cell/row? row) produces true
+          ;;   if row contains one or more used cells, and
+          ;;   false otherwise
+          ;; contains-used-cell/row?: (listof Cell) -> Bool
+          
           (define (contains-used-cell/row? row)
             (foldr (lambda (f r) (cond [(cell-used? f) true]
                                        [else r])) false row))]
@@ -182,20 +390,36 @@
                  [else rlst]))
          false rectangle)))
 
+
+;; (contains-one-number? rect grid) produces true if the Rectangle
+;;   in grid, defined by rect, contains exactly one non-empty cell,
+;;   and false otherwise
+;; contains-one-number?: Rect Grid -> Bool
+
 (define (contains-one-number? rect grid)
   (local [(define rectangle (rect-in-grid rect grid))
+          ;; (count-non-zero-number-row row) produces the number
+          ;;   of non-empty cells in row.
+          ;; count-non-zero-number-row: (listof Cell) -> Nat
+          
           (define (count-non-zero-number-row row)
             (length (filter (lambda (x) (not (zero? (cell-num x)))) row)))
+
+          ;; (count-non-zero-number-rect rect) produces the number
+          ;;   of non-empty cells in rect (the sub-grid in grid)
+          ;; count-non-zero-number-rect: Grid -> Nat
+          
           (define (count-non-zero-number-rect rect)
             (foldr (lambda (flst rlst)
                      (+ (count-non-zero-number-row flst) rlst)) 0 rect))]
     (= 1 (count-non-zero-number-rect rectangle))))
 
-(define (find-only-num rect grid)
-  (local [(define rectangle (rect-in-grid rect grid))]
-    (foldr (lambda (flst rlst)
-             (cons (filter (lambda (x) (not (zero? (cell-num x)))) flst) rlst))
-           empty rectangle)))
+
+;; (num-equal-area? rect grid) produces true if the Rectangle
+;;   in grid, defined by rect, has an area equal to the number
+;;   in rect's only non-empty cell, and false if they are not
+;;   equal.
+;; num-equal-area?: Rect Grid -> Bool
 
 (define (num-equal-area? rect grid)
   (local [(define rectangle (rect-in-grid rect grid))
@@ -212,26 +436,139 @@
     (= only-num area)))
                      
 
-
+;; (valid-rect? rect grid) produces true if the Rectangle
+;;   in grid, defined by rect, is considered valid under
+;;   the rule of the rectangle puzzle, and false if it is
+;;   invalid.
+;; valid-rect?: Rect Grid -> Bool
 
 (define (valid-rect? rect grid)
   (local [(define rectangle (rect-in-grid rect grid))]
-    (and (not (contains-used-cell rect grid))
+    (and (not (contains-used-cell? rect grid))
          (contains-one-number? rect grid)
          (num-equal-area? rect grid))))
+
+
+;; (shade-used-cell rect grid) produces a Grid where all cells 
+;;    covered by rect in grid are marked as used.
+;; shade-used-cell: Rect Grid -> Grid
+
+(define (shade-used-cell rect grid)
+  (local [;; (shade-row/index row index) marks the cells covered
+          ;;   by rect in row to be used, using index as accumulator
+          ;; shade-row/index: (listof Cell) Nat -> (listof Cell)
           
+          (define (shade-row/index row index)
+            (cond [(empty? row) empty]
+                  [(< index (rect-x rect))
+                   (cons (first row) (shade-row/index (rest row) (add1 index)))]
+                  [(>= index (+ (rect-x rect) (rect-w rect))) row]
+                  [else
+                   (cons (make-cell (cell-num (first row)) true)
+                         (shade-row/index (rest row) (add1 index)))]))
 
-    
+          ;; (shade-grid/index grid index) marks the cells covered
+          ;;   by rect in grid to be used, using index as accumulator
+          ;; shade-grid/index: Grid Nat -> Grid
+          
+          (define (shade-grid/index grid index)
+            (cond [(empty? grid) empty]
+                  [(< index (rect-y rect))
+                   (cons (first grid) (shade-grid/index (rest grid) (add1 index)))]
+                  [(>= index (+ (rect-y rect) (rect-h rect))) grid]
+                  [else
+                   (cons (shade-row/index (first grid) 0)
+                         (shade-grid/index (rest grid) (add1 index)))]))]
+    (shade-grid/index grid 0)))
 
-;;(define (valid-rec? rect grid)
-;;  (local [
-;;          (define (contains-used-row? rect row)
-;;            (cond [(
-;;          (define (contains-used? rect grid)
-;;            empty)
-; ;         (define (contains-more-than-one-number? rect grid)
-;;            empty)
 
-;;(rect-in-grid (make-rect 0 0 2 2) (state-grid first-unused-at-2-1))
+;; (neighbours state) consumes state and produces a list of
+;;   new states that might legitimately follow from the given
+;;   state after adding a single rectangle.
+;; neighbours: State -> (listof State)
+;; Example
+(check-expect (neighbours (construct-puzzle 2x2-puzz1))
+              2x2-puzz1-neighbour)
+(check-expect (neighbours (construct-puzzle 3x3-puzz))
+              3x3-puzz-neighbour)
+
 (define (neighbours state)
-  empty)
+  (local [(define grid (state-grid state))
+          (define first-unused-cell
+            (get-first-unused grid))
+          (define first-unused-x
+            (first first-unused-cell))
+          (define first-unused-y
+            (second first-unused-cell))
+          ;; (search-right/index grid cur-y cur-x) searches
+          ;;   for all possible next state from the parameter
+          ;;   state, in a row defined by grid[cur-y], using
+          ;;   cur-x as accumulator.
+          ;; search-right/index: Grid Nat Nat -> (listof State)
+          
+          (define (search-right/index grid cur-y cur-x)
+            (cond [(>= cur-x (length (first grid))) empty]
+                  [else
+                   (local [(define rect
+                             (make-rect first-unused-x
+                                        first-unused-y
+                                        (add1 (- cur-x first-unused-x))
+                                        (add1 (- cur-y first-unused-y))))]
+                     (cond [(valid-rect? rect grid)
+                            (cons (make-state (shade-used-cell rect grid)
+                                              (cons rect (state-rects state)))
+                                  (search-right/index
+                                   grid cur-y (add1 cur-x)))]
+                           [else
+                            (search-right/index grid cur-y (add1 cur-x))]))]))
+
+          ;; (search-down/index grid cur-y) searches for all
+          ;;   possible next state from the parameter state
+          ;;   in grid, using cur-y as accumulator
+          ;; search-down/index: Grid Nat -> (listof State)
+          
+          (define (search-down/index grid cur-y)
+            (cond [(>= cur-y (length grid)) empty]
+                  [else
+                   (append (search-right/index grid cur-y first-unused-x)
+                           (search-down/index grid (add1 cur-y)))]))]
+    (search-down/index (state-grid state) first-unused-y)))
+
+;; Test
+(check-expect (neighbours (construct-puzzle 2x2-puzz1))
+              2x2-puzz1-neighbour)
+(check-expect (neighbours (construct-puzzle 3x3-puzz))
+              3x3-puzz-neighbour)
+
+
+;; ========================= (f) ===============================
+;; (solve-rectangle-puzzle puzzle) consumes puzzle and attempts
+;;   to solve the puzzle, producing either the list of rectangles
+;;   that describe a solution if one exists, or false if no solution
+;;   can be found
+;; solve-rectangle-puzzle: (listof (listof Nat))
+;;                         -> (anyof (listof Rect) false)
+;; Example
+(check-expect (solve-rectangle-puzzle 2x2-puzz1)
+              2x2-puzz1-soln)
+(check-expect (solve-rectangle-puzzle 2x2-puzz2)
+              2x2-puzz2-soln)
+(check-expect (solve-rectangle-puzzle unsolveable-puzz)
+              false)
+
+(define (solve-rectangle-puzzle puzzle)
+  (local [(define result (search solved? neighbours
+                                 (construct-puzzle puzzle)))]
+    (cond [(false? result) false]
+          [else
+           (state-rects result)])))
+
+;; Test
+(check-expect (solve-rectangle-puzzle puzz)
+              puzz-soln)
+(check-expect (solve-rectangle-puzzle 3x3-puzz)
+              3x3-puzz-soln)
+(check-expect (solve-rectangle-puzzle 4x4-puzz)
+              4x4-puzz-soln)
+(check-expect (solve-rectangle-puzzle unsolveable-puzz)
+              false)

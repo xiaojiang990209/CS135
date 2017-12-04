@@ -16,6 +16,13 @@
   '(1 0 1 1 0 1 0 1 0 1 1 1 1 0 0 1 1 0
     0 0 1 0 0 0 0 1 0 1 1 1 1 1 1 1 1 0))
 (define sample-rule 86)
+(define sample-initial-row
+  '(1 1 1 0 1 1 0))
+(define sample-ra-result
+  '((1 1 1 0 1 1 0)
+    (0 0 1 0 0 1 1)
+    (0 1 1 1 1 0 1)
+    (1 0 0 0 1 0 1)))
 
 
 ;; ================= (a) =====================
@@ -56,11 +63,16 @@
 ;; Examples
 (check-expect (next-row sample-current-row sample-rule)
               sample-next-row)
+(check-expect (next-row '(1) 86) '(1))
+(check-expect (next-row '(1 0) 86) '(1 1))
+(check-expect (next-row '() 86) '())
 
 (define (next-row current-row rule)
   (build-list (length current-row)
               (lambda (i)
-                (cond [(zero? i)
+                (cond [(= 1 (length current-row))
+                       (apply-rule 0 (list-ref current-row i) 0 rule)]
+                      [(zero? i)
                        (apply-rule 0 (list-ref current-row i)
                                    (list-ref current-row (add1 i))
                                    rule)]
@@ -73,6 +85,11 @@
                                    (list-ref current-row i)
                                    (list-ref current-row (add1 i))
                                    rule)]))))
+
+;; Test
+(check-expect (next-row '(1) 86) '(1))
+(check-expect (next-row '(1 0) 86) '(1 1))
+(check-expect (next-row '() 86) '())
 
 
 ;; ==================== (c) =========================
@@ -94,14 +111,25 @@
 
 
 ;; ====================== (d) ============================
-;; (run-automation initial-row rule n) consumes a non-empty
+;; (run-automaton initial-row rule n) consumes a non-empty
 ;;   initial-row, a CA rule, and n representing number of
 ;;   generations, and produces a list of n lists representing
 ;;   the initial-row's transformation from the applicaiton of rule
-;; run-automation: (listof (anyof 0 1)) Nat Nat
+;; run-automaton: (listof (anyof 0 1)) Nat Nat
 ;;                 -> (listof (listof (anyof 0 1))
 ;; requires: 0 <= rule <= 255
 ;;           initial-row is non-empty
+;; Examples
+(check-expect (run-automaton sample-initial-row sample-rule 4)
+              sample-ra-result)
+(check-expect (run-automaton sample-current-row sample-rule 2)
+              (cons sample-current-row (list sample-next-row)))
 
-(define (run-automation initial-row rule n)
+(define (run-automaton initial-row rule n)
   (iterate (lambda (row) (next-row row rule)) initial-row n))
+
+;; Tests
+(check-expect (run-automaton sample-initial-row sample-rule 4)
+              sample-ra-result)
+(check-expect (run-automaton sample-current-row sample-rule 2)
+              (cons sample-current-row (list sample-next-row)))

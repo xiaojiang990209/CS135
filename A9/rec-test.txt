@@ -1,0 +1,194 @@
+(define puzz-soln
+  (list
+   (make-rect 5 5 2 2)
+   (make-rect 4 5 1 2)
+   (make-rect 1 5 3 2)
+   (make-rect 0 5 1 2)
+   (make-rect 0 4 4 1)
+   (make-rect 5 3 2 2)
+   (make-rect 5 2 2 1)
+   (make-rect 4 2 1 3)
+   (make-rect 4 1 2 1)
+   (make-rect 2 1 2 3)
+   (make-rect 1 1 1 3)
+   (make-rect 6 0 1 2)
+   (make-rect 1 0 5 1)
+   (make-rect 0 0 1 4)))
+(define sample-puzzle1
+  '((0 0 1)
+    (2 2 1)
+    (1 1 1)))
+(define sample-puzzle1-state
+  (make-state
+   (list (list
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 1 false))
+         (list
+          (make-cell 2 false)
+          (make-cell 2 false)
+          (make-cell 1 false))
+         (list
+          (make-cell 1 false)
+          (make-cell 1 false)
+          (make-cell 1 false))) empty))
+(define first-unused-at-2-1
+  (make-state
+   (list (list
+          (make-cell 0 true)
+          (make-cell 1 true)
+          (make-cell 2 true))
+         (list
+          (make-cell 3 true)
+          (make-cell 4 true)
+          (make-cell 5 false))
+         (list
+          (make-cell 6 false)
+          (make-cell 7 false)
+          (make-cell 8 false))) empty))
+(define sample-state
+  (make-state
+   (list (list
+          (make-cell 0 true)
+          (make-cell 0 true)
+          (make-cell 0 true)
+          (make-cell 2 true)
+          (make-cell 0 true)
+          (make-cell 2 true)
+          (make-cell 0 true))
+         (list
+          (make-cell 0 true)
+          (make-cell 0 true)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 4 false)
+          (make-cell 0 true))
+         (list
+          (make-cell 0 true)
+          (make-cell 3 true)
+          (make-cell 6 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 true))
+         (list
+          (make-cell 4 true)
+          (make-cell 2 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 4 false)
+          (make-cell 0 true))
+         (list
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 2 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 true))
+         (list
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 10 false)
+          (make-cell 0 false)
+          (make-cell 7 true))
+         (list
+          (make-cell 3 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 false)
+          (make-cell 0 true)))
+   empty))
+(define 2x2-puzz1
+  '((2 0)
+    (0 2)))
+(define 2x2-puzz1-neighbour
+  (list
+   (make-state
+    (list (list
+           (make-cell 2 true)
+           (make-cell 0 true))
+          (list
+           (make-cell 0 false)
+           (make-cell 2 false)))
+    (list (make-rect 0 0 2 1)))
+   (make-state
+    (list (list
+           (make-cell 2 true)
+           (make-cell 0 false))
+          (list
+           (make-cell 0 true)
+           (make-cell 2 false)))
+    (list (make-rect 0 0 1 2)))))
+(define 2x2-puzz1-soln 
+  (list (make-rect 0 1 2 1)
+        (make-rect 0 0 2 1)))
+(define 2x2-puzz2
+  '((0 0)
+    (4 0)))
+(define 2x2-puzz2-soln
+  (list (make-rect 0 0 2 2)))
+(define 3x3-puzz
+  '((3 0 2)
+    (0 2 0)
+    (0 2 0)))
+(define 3x3-puzz-neighbour
+  (list
+   (make-state
+    (list (list
+           (make-cell 3 true)
+           (make-cell 0 false)
+           (make-cell 2 false))
+          (list
+           (make-cell 0 true)
+           (make-cell 2 false)
+           (make-cell 0 false))
+          (list
+           (make-cell 0 true)
+           (make-cell 2 false)
+           (make-cell 0 false)))
+    (list (make-rect 0 0 1 3)))))
+(define 3x3-puzz-soln
+  (list (make-rect 1 2 2 1)
+        (make-rect 1 1 2 1)
+        (make-rect 1 0 2 1)
+        (make-rect 0 0 1 3)))
+(define 4x4-puzz
+  '((4 0 4 0)
+    (0 0 0 0)
+    (4 0 4 0)
+    (0 0 0 0)))
+(define 4x4-puzz-soln
+  (list (make-rect 2 2 2 2)
+        (make-rect 0 2 2 2)
+        (make-rect 2 0 2 2)
+        (make-rect 0 0 2 2)))
+(define unsolveable-puzz
+  '((0 0 0)
+    (0 1 0)
+    (0 0 0)))
+(check-expect (map2d add1 '((0 1) (2 3))) '((1 2) (3 4)))
+(check-expect (map2d add1 empty) empty)
+(check-expect (map2d add1 empty) empty)
+(check-expect (map2d sqr '((1 2) (3 4))) '((1 4) (9 16)))
+(check-expect (construct-puzzle empty) (make-state empty empty))
+(check-expect (construct-puzzle sample-puzzle1)
+              sample-puzzle1-state)
+(check-expect (solved? (make-state empty empty)) true)
+(check-expect (solved? first-unused-at-2-1) false)
+(check-expect (solved? (make-state empty empty)) true)
+(check-expect (solved? sample-state) false)
+(check-expect (get-first-unused (state-grid first-unused-at-2-1))
+              (list 2 1))
+(check-expect (get-first-unused (state-grid sample-state))
+              (list 2 1))
+(check-expect (get-first-unused (state-grid first-unused-at-2-1))
+              (list 2 1))
+(check-expect (get-first-unused (state-grid sample-state))
+              (list 2 1))
